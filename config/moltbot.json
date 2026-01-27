@@ -1,0 +1,65 @@
+{
+    // ClawdBot/Moltbot Configuration
+    // Copy this file to ~/.clawdbot/moltbot.json on your server
+    "agents": {
+        "defaults": {
+            "workspace": "~/clawd",
+            "model": "claude-sonnet-4-20250514"
+        }
+    },
+    "channels": {
+        // Telegram Configuration
+        "telegram": {
+            "enabled": true,
+            "dm": {
+                "policy": "allowlist",
+                "allowFrom": [
+                    "829049220",
+                    "1383989988"
+                ]
+            },
+            "groups": {
+                "policy": "allowlist",
+                "allowFrom": []
+            }
+        },
+        // WhatsApp Configuration
+        "whatsapp": {
+            "enabled": true,
+            "dm": {
+                "policy": "allowlist",
+                "allowFrom": [
+                    "+963949924759",
+                    "+963936854969"
+                ]
+            },
+            "groups": {
+                "policy": "allowlist",
+                "allowFrom": []
+            }
+        }
+    },
+    // Admin users for reference
+    "_admins": {
+        "telegram": [
+            {
+                "name": "Aman Kharzoum",
+                "id": "829049220"
+            },
+            {
+                "name": "Abdulrahman Kharzoum",
+                "id": "1383989988"
+            }
+        ],
+        "whatsapp": [
+            {
+                "name": "Aman Kharzoum",
+                "phone": "+963949924759"
+            },
+            {
+                "name": "Abdulrahman Kharzoum",
+                "phone": "+963936854969"
+            }
+        ]
+    }
+}
