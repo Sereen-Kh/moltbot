@@ -8,6 +8,18 @@ RUN corepack enable
 
 WORKDIR /app
 
+# Install ffmpeg and other dependencies for video processing
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    ffmpeg \
+    python3 \
+    python3-pip \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
+# Install Whisper for transcription (optional - can be done via Node.js libraries too)
+RUN pip3 install --no-cache-dir openai-whisper --break-system-packages
+
 ARG CLAWDBOT_DOCKER_APT_PACKAGES=""
 RUN if [ -n "$CLAWDBOT_DOCKER_APT_PACKAGES" ]; then \
       apt-get update && \

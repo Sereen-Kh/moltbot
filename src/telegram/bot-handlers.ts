@@ -1,3 +1,82 @@
+import { VideoHandler } from "../handlers/videoHandler";
+  // VideoHandler for /transcript and auto-detect
+  const videoHandler = new VideoHandler();
+
+  // /transcript command handler
+  bot.command("transcript", async (ctx) => {
+    const url = ctx.message?.text?.split(" ")[1];
+
+    if (!url) {
+      return ctx.reply(
+        "❌ Usage: /transcript <url>\n\n" +
+        "Supported platforms:\n" +
+        "• YouTube\n" +
+        "• Instagram\n" +
+        "• TikTok\n" +
+        "• Twitter/X\n" +
+        "• Facebook\n" +
+        "• And more!"
+      );
+    }
+
+    if (!videoHandler.isSocialMediaLink(url)) {
+      return ctx.reply("❌ Invalid or unsupported URL");
+    }
+
+    const statusMsg = await ctx.reply("⏳ Processing your video...");
+    const result = await videoHandler.processVideo(url);
+
+    if (!result.success) {
+      return ctx.telegram.editMessageText(
+        ctx.chat?.id,
+        statusMsg.message_id,
+        undefined,
+        `❌ Error: ${result.error}`
+      );
+    }
+
+    const response =
+      `✅ **${result.title}**\n\n` +
+      `🗣️ Language: ${result.language}\n\n` +
+      `📝 **Transcription:**\n${result.transcription}`;
+
+    // Handle long transcriptions (Telegram limit: 4096 chars)
+    if (response.length > 4000) {
+      await ctx.telegram.editMessageText(
+        ctx.chat?.id,
+        statusMsg.message_id,
+        undefined,
+        "📝 Transcription complete! Sending in parts..."
+      );
+      const chunks = response.match(/[\s\S]{1,4000}/g) || [];
+      for (let i = 0; i < chunks.length; i++) {
+        await ctx.reply(`📝 Part ${i + 1}/${chunks.length}\n\n${chunks[i]}`);
+      }
+    } else {
+      await ctx.telegram.editMessageText(
+        ctx.chat?.id,
+        statusMsg.message_id,
+        undefined,
+        response
+      );
+    }
+  });
+
+  // Auto-detect URLs in messages
+  bot.on("text", async (ctx, next) => {
+    const text = ctx.message?.text;
+    if (!text) return next();
+    const urlMatch = text.match(/(https?:\/\/[^\s]+)/);
+    if (!urlMatch) return next();
+    const url = urlMatch[0];
+    if (videoHandler.isSocialMediaLink(url)) {
+      await ctx.reply(
+        "🔗 Social media link detected!\n" +
+        `Use /transcript ${url} to get transcription.`
+      );
+    }
+    return next();
+  });
 // @ts-nocheck
 import { hasControlCommand } from "../auto-reply/command-detection.js";
 import {
